@@ -1,0 +1,1745 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hash Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #212529;
+      --text-muted: #6c757d;
+      --border-color: #dee2e6;
+      --input-bg: #ffffff;
+      --input-text: #212529;
+      --primary-color: #667eea;
+      --secondary-color: #764ba2;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #ffffff;
+      --text-muted: #b0b0b0;
+      --border-color: #444444;
+      --input-bg: #2d2d2d;
+      --input-text: #ffffff;
+      --primary-color: #4a5568;
+      --secondary-color: #2d3748;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      min-height: 100vh;
+      position: relative;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      max-width: 900px;
+    }
+
+    .card {
+      border: none;
+      border-radius: 16px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: transparent;
+      color: var(--text-color);
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 16px 16px 0 0 !important;
+      padding: 1.5rem 2rem;
+    }
+
+    .form-switch .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .font-monospace {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    .spinner-border {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .btn-outline-primary {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .form-control, .form-select {
+      background-color: var(--input-bg);
+      color: var(--input-text);
+      border-color: var(--border-color);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: var(--input-bg);
+      color: var(--input-text);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-muted);
+    }
+
+    .dropdown-menu {
+      background-color: var(--card-bg);
+      border-color: var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      border: none;
+    }
+
+    .dropdown-item {
+      color: var(--text-color);
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s ease;
+      border-radius: 6px;
+      margin: 2px 8px;
+      width: auto;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .dropdown-header {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.5rem 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .form-label {
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .form-check-label {
+      color: var(--text-color);
+      font-weight: 500;
+    }
+
+    .text-muted {
+      color: var(--text-muted) !important;
+    }
+
+    .alert {
+      background-color: var(--card-bg);
+      border-color: var(--border-color);
+      color: var(--text-color);
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .alert-success {
+      background-color: rgba(40, 167, 69, 0.08);
+      border-left: 4px solid #28a745;
+      color: var(--text-color);
+    }
+
+    .alert-danger {
+      background-color: rgba(220, 53, 69, 0.08);
+      border-left: 4px solid #dc3545;
+      color: var(--text-color);
+    }
+
+    .alert-info {
+      background-color: rgba(23, 162, 184, 0.08);
+      border-left: 4px solid #17a2b8;
+      color: var(--text-color);
+    }
+
+    .theme-toggle-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.4s ease;
+      background: var(--card-bg);
+      color: var(--text-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-toggle-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.6s;
+    }
+
+    .theme-toggle-btn:hover::before {
+      left: 100%;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .algo-dropdown-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .algo-dropdown-btn:hover {
+      background: var(--card-bg);
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+      color: var(--primary-color);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin: 0;
+    }
+
+    .header-icon {
+      color: var(--primary-color);
+      margin-right: 12px;
+      font-size: 1.4rem;
+    }
+
+    #fileInfo {
+      color: var(--text-muted) !important;
+      font-size: 0.85rem;
+    }
+
+    .btn-outline-secondary {
+      color: var(--text-color);
+      border-color: var(--border-color);
+      background-color: transparent;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: var(--border-color);
+      color: var(--text-color);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-info {
+      font-size: 0.875rem;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: var(--bg-color);
+      border-radius: 6px;
+      border-left: 3px solid var(--primary-color);
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .form-check-input {
+      cursor: pointer;
+      width: 3em;
+      height: 1.5em;
+    }
+
+    .form-check-label {
+      cursor: pointer;
+      user-select: none;
+      margin-left: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .btn, .form-control, .form-select, .form-check-input, .dropdown-item {
+      transition: all 0.3s ease;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 60px;
+      line-height: 1.5;
+    }
+
+    .processing-spinner {
+      color: var(--primary-color);
+    }
+    .form-check-input {
+  cursor: pointer;
+  width: 3.5em;
+  height: 1em;
+  transform: scale(1.1);
+}
+
+.form-check-label {
+  cursor: pointer;
+  user-select: none;
+  margin-left: 0.5rem;
+  font-size: 0.95rem;
+}
+
+    @media (max-width: 768px) {
+      .card-body {
+        padding: 1.5rem;
+      }
+      
+      .card-header {
+        padding: 1.25rem 1.5rem;
+      }
+      
+      .header-title {
+        font-size: 1.25rem;
+      }
+      
+      .header-right {
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    /* New styles for features section */
+    .features-section {
+      margin-top: 2rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .feature-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .feature-description {
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .algo-badge {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin: 0.25rem;
+    }
+
+    .export-format {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-color);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .export-format i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <div class="header-left">
+        <h1 class="header-title">
+          Hash Calculator
+        </h1>
+      </div>
+      <div class="header-right">
+        <div class="dropdown">
+          <button class="btn algo-dropdown-btn dropdown-toggle" type="button" id="algoDisplay" data-bs-toggle="dropdown">
+            SHA-256
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="algoDisplay">
+            <li><h6 class="dropdown-header">SHA-1</h6></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA-1">SHA-1</a></li>
+
+            <li><h6 class="dropdown-header">SHA-2</h6></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA-224">SHA-224</a></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA-256">SHA-256</a></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA-384">SHA-384</a></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA-512">SHA-512</a></li>
+
+            <li><h6 class="dropdown-header">SHA-3</h6></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA3-224">SHA3-224</a></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA3-256">SHA3-256</a></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA3-384">SHA3-384</a></li>
+            <li><a class="dropdown-item" href="#" data-value="SHA3-512">SHA3-512</a></li>
+          </ul>
+        </div>
+        <button id="themeToggle" class="btn theme-toggle-btn">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+      <input type="hidden" id="algorithm" value="SHA-256">
+    </div>
+
+    <div class="card-body">
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="uppercase">
+            <label class="form-check-label" for="uppercase">Uppercase Output</label>
+          </div>
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" id="liveUpdate" checked>
+            <label class="form-check-label" for="liveUpdate">Live Update</label>
+          </div>
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" id="bulkMode">
+            <label class="form-check-label" for="bulkMode">Bulk Mode</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="includeSalt">
+            <label class="form-check-label" for="includeSalt">Include Salt</label>
+          </div>
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" id="hashComparison">
+            <label class="form-check-label" for="hashComparison">Hash Comparison</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="saltContainer" class="mb-4" style="display:none;">
+        <label class="form-label">Salt</label>
+        <textarea class="form-control" id="saltValue" rows="2" placeholder="Enter salt..."></textarea>
+      </div>
+
+      <div id="compareContainer" class="mb-4" style="display:none;">
+        <label class="form-label">Compare Hash</label>
+        <textarea class="form-control" id="compareHashValue" rows="2" placeholder="Enter hash to compare..."></textarea>
+      </div>
+
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <label class="form-label section-title">Input Text</label>
+          <div>
+            <button id="pasteBtn" class="btn btn-sm btn-outline-secondary me-2">
+              <i class="fas fa-paste me-1"></i>Paste
+            </button>
+            <button id="uploadBtn" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-upload me-1"></i>Upload
+            </button>
+          </div>
+        </div>
+        <textarea class="form-control" id="inputText" rows="6" placeholder="Enter text to hash..."></textarea>
+        <!-- <div id="fileInfo" class="file-info text-muted mt-2"></div> -->
+      </div>
+
+      <div id="fileUploadAlert" class="alert alert-info mb-4" style="display:none;">
+        <i class="fas fa-info-circle me-2"></i>
+        <span id="fileAlertMessage"></span>
+      </div>
+
+      <div id="comparisonAlert" class="alert mb-4" style="display:none;"></div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <label class="form-label section-title">
+            Output Hash 
+            <span id="processing" class="spinner-border spinner-border-sm processing-spinner ms-2" style="display:none;"></span>
+          </label>
+          <div>
+            <button id="copyBtn" class="btn btn-sm btn-outline-secondary me-2">
+              <i class="fas fa-copy me-1"></i>Copy
+            </button>
+            <button id="downloadBtn" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-download me-1"></i>Download
+            </button>
+          </div>
+        </div>
+        <textarea class="form-control font-monospace" id="outputHash" rows="5" readonly>Hash result will appear here...</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="features-section">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <h2 class="section-title">Supported Algorithms</h2>
+        
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="feature-title">SHA-1</h3>
+          <p class="feature-description">
+            <span class="algo-badge">160-bit hash</span> - legacy support for older systems
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h3 class="feature-title">SHA-256</h3>
+          <p class="feature-description">
+            <span class="algo-badge">256-bit hash</span> - industry standard for security applications
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <h3 class="feature-title">SHA-384</h3>
+          <p class="feature-description">
+            <span class="algo-badge">384-bit hash</span> - enhanced security for sensitive data
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <h3 class="feature-title">SHA-512</h3>
+          <p class="feature-description">
+            <span class="algo-badge">512-bit hash</span> - maximum security for critical applications
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <h3 class="feature-title">SHA3</h3>
+          <p class="feature-description">
+            <span class="algo-badge">512-bit hash</span> - SHA-3 with excellent security
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-12 mb-4">
+        <h2 class="section-title">Professional Export Features</h2>
+    
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-file-csv"></i>
+          </div>
+          <h3 class="feature-title">CSV Export</h3>
+          <p class="feature-description">
+            Export all hash results to CSV spreadsheet format. Easy to import into Excel, Google Sheets, 
+            or databases for further analysis and record-keeping.
+          </p>
+          <div class="mt-3">
+            <span class="export-format"><i class="fas fa-check"></i> File names</span>
+            <span class="export-format"><i class="fas fa-check"></i> File sizes</span>
+            <span class="export-format"><i class="fas fa-check"></i> Hash values</span>
+            <span class="export-format"><i class="fas fa-check"></i> Verification status</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-file-text"></i>
+          </div>
+          <h3 class="feature-title">Plain Text (TXT)</h3>
+          <p class="feature-description">
+            Simple ASCII text format with clear formatting. Compatible with any text editor and ideal for 
+            embedding in documentation or email.
+          </p>
+          <div class="mt-3">
+            <span class="export-format"><i class="fas fa-check"></i> ASCII format</span>
+            <span class="export-format"><i class="fas fa-check"></i> Text editor compatible</span>
+            <span class="export-format"><i class="fas fa-check"></i> Email friendly</span>
+            <span class="export-format"><i class="fas fa-check"></i> Documentation ready</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Add SheetJS library for Excel file processing -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Enhanced Hash Calculator Started!");
+    
+    const elements = {
+        input: document.getElementById("inputText"),
+        output: document.getElementById("outputHash"),
+        algorithm: document.getElementById("algorithm"),
+        uppercase: document.getElementById("uppercase"),
+        liveUpdate: document.getElementById("liveUpdate"),
+        bulkMode: document.getElementById("bulkMode"),
+        includeSalt: document.getElementById("includeSalt"),
+        saltValue: document.getElementById("saltValue"),
+        saltContainer: document.getElementById("saltContainer"),
+        hashComparison: document.getElementById("hashComparison"),
+        compareHashValue: document.getElementById("compareHashValue"),
+        compareContainer: document.getElementById("compareContainer"),
+        processing: document.getElementById("processing"),
+        copyBtn: document.getElementById("copyBtn"),
+        downloadBtn: document.getElementById("downloadBtn"),
+        pasteBtn: document.getElementById("pasteBtn"),
+        uploadBtn: document.getElementById("uploadBtn"),
+        fileInfo: document.getElementById("fileInfo"),
+        fileUploadAlert: document.getElementById("fileUploadAlert"),
+        fileAlertMessage: document.getElementById("fileAlertMessage"),
+        comparisonAlert: document.getElementById("comparisonAlert"),
+        algoDisplay: document.getElementById("algoDisplay"),
+        themeToggle: document.getElementById("themeToggle")
+    };
+
+    // ==================== DARK/LIGHT MODE FUNCTIONALITY ====================
+
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    }
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        
+    // apply body-level classes so the whole page reflects the theme
+    applyBodyThemeClasses(theme);
+
+    if (theme === 'dark') {
+      elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      elements.themeToggle.style.color = '#ffc107';
+    } else {
+      elements.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+      elements.themeToggle.style.color = 'var(--text-color)';
+    }
+    }
+
+  // Ensure the whole page (not only the card) uses the theme variables.
+  // Bootstrap's `bg-light` on <body> can override our CSS variables, so update body classes.
+  function applyBodyThemeClasses(theme) {
+    // remove any bootstrap bg classes we care about
+    document.body.classList.remove('bg-light', 'bg-dark', 'text-white');
+    if (theme === 'dark') {
+      // add dark class to body so elements that depend on bootstrap utilities get proper color
+      document.body.classList.add('bg-dark', 'text-white');
+    } else {
+      document.body.classList.add('bg-light');
+    }
+  }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+    }
+
+    // ==================== FILE UPLOAD FUNCTIONS ====================
+
+    function showFileAlert(message, type = 'info') {
+        elements.fileAlertMessage.textContent = message;
+        elements.fileUploadAlert.className = `alert alert-${type}`;
+        elements.fileUploadAlert.style.display = 'block';
+        
+        setTimeout(() => {
+            elements.fileUploadAlert.style.display = 'none';
+        }, 5000);
+    }
+
+    function readTextFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = e => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    function readBinaryFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const arrayBuffer = e.target.result;
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    let hexString = '';
+                    
+                    for (let i = 0; i < uint8Array.length; i++) {
+                        hexString += uint8Array[i].toString(16).padStart(2, '0');
+                    }
+                    
+                    resolve(`Binary File Hex: ${hexString.substring(0, 1000)}...`);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = e => reject(e);
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+  function readExcelFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+
+          // Convert all sheets to text and gather all non-empty cell values
+          let textContent = '';
+          const cells = [];
+
+          workbook.SheetNames.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            textContent += `Sheet: ${sheetName}\n`;
+            jsonData.forEach(row => {
+              // row might be an array of cell values
+              const rowValues = row.map(cell => (cell === undefined || cell === null) ? '' : String(cell));
+              // collect non-empty cells
+              rowValues.forEach(val => {
+                if (val && val.toString().trim().length > 0) cells.push(val.toString().trim());
+              });
+              textContent += rowValues.join('\t') + '\n';
+            });
+            textContent += '\n';
+          });
+
+          resolve({ textContent, cells });
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = e => reject(e);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function handleFileUpload(file) {
+    // #fileInfo div may be commented out in the HTML; guard against null
+    if (elements.fileInfo) {
+      elements.fileInfo.textContent = `File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    }
+        elements.processing.style.display = "inline-block";
+        
+        try {
+            let text;
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            
+            if (fileExtension.match(/(txt|csv|json|xml|html|htm)$/)) {
+                showFileAlert('Processing text file...', 'info');
+                text = await readTextFile(file);
+      } else if (fileExtension.match(/(xlsx|xls)$/)) {
+        showFileAlert('Processing Excel file...', 'info');
+        const excelResult = await readExcelFile(file);
+        // readExcelFile now returns an object with textContent and cells
+        text = excelResult.textContent;
+
+        // If bulk mode is on and there are extracted cells, attempt to extract emails directly
+        if (elements.bulkMode.checked && Array.isArray(excelResult.cells) && excelResult.cells.length > 0) {
+          const foundEmails = [];
+          for (const cellVal of excelResult.cells) {
+            const matches = extractEmails(cellVal);
+            if (matches && matches.length) {
+              for (const m of matches) foundEmails.push(m);
+            }
+          }
+
+          if (foundEmails.length > 0) {
+            // Immediately compute bulk hashes for the found emails and show output
+            const algorithm = elements.algorithm.value;
+            const useUppercase = elements.uppercase.checked;
+            const useSalt = elements.includeSalt.checked;
+            const salt = useSalt ? elements.saltValue.value : "";
+
+              const results = [];
+              // Process ALL found emails (do not deduplicate by default) to support full-sheet hashing
+              for (const email of foundEmails) {
+                const dataToHash = salt + email;
+                let hashResult = generateHash(dataToHash, algorithm);
+                if (useUppercase) hashResult = hashResult.toUpperCase();
+                results.push({ input: email, hash: hashResult });
+              }
+
+              // If the result set is large, offer a download instead of stuffing the textarea
+              const LARGE_THRESHOLD = 2000;
+              if (results.length > LARGE_THRESHOLD) {
+                // build CSV and trigger download
+                const lines = ['input,hash'];
+                for (const r of results) {
+                  // Escape double quotes
+                  const inVal = '"' + r.input.replace(/"/g, '""') + '"';
+                  const hVal = '"' + r.hash + '"';
+                  lines.push(`${inVal},${hVal}`);
+                }
+                const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hashes_${file.name.replace(/\.[^/.]+$/, '')}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                elements.input.value = text;
+                elements.output.value = `Generated ${results.length} hashes and downloaded as CSV.`;
+                elements.processing.style.display = 'none';
+                showFileAlert(`Generated ${results.length} hashes and downloaded CSV.`, 'success');
+                return;
+              }
+
+              // small result -> display in textarea
+              elements.input.value = text;
+              elements.output.value = results.map(r => `${r.input}: ${r.hash}`).join('\n');
+              elements.processing.style.display = 'none';
+              showFileAlert(`Found ${results.length} emails in Excel and generated hashes.`, 'success');
+              return;
+          }
+        }
+            } else {
+                showFileAlert('Processing binary file... Creating hex representation.', 'warning');
+                text = await readBinaryFile(file);
+            }
+            
+            elements.input.value = text;
+            computeHash();
+            showFileAlert(`File "${file.name}" loaded successfully!`, 'success');
+            
+        } catch (error) {
+            console.error("File reading error:", error);
+            showFileAlert(`Error reading file: ${error.message}`, 'danger');
+        } finally {
+            elements.processing.style.display = "none";
+        }
+    }
+
+    // ==================== HASH IMPLEMENTATIONS ====================
+
+    function bytesToHex(bytes) {
+        return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function strToBytes(str) {
+        if (typeof str !== 'string') return new Uint8Array();
+        const bytes = new Uint8Array(str.length);
+        for (let i = 0; i < str.length; i++) {
+            bytes[i] = str.charCodeAt(i);
+        }
+        return bytes;
+    }
+
+    // SHA-1 Implementation
+    function sha1(message) {
+        const rotateLeft = (n, b) => (n << b) | (n >>> (32 - b));
+        const msg = strToBytes(message);
+        const bitLength = msg.length * 8;
+        
+        const padded = new Uint8Array((((msg.length + 8) >>> 6) + 1) * 64);
+        padded.set(msg);
+        padded[msg.length] = 0x80;
+        
+        const view = new DataView(padded.buffer);
+        view.setUint32(padded.length - 8, Math.floor(bitLength / 0x100000000), false);
+        view.setUint32(padded.length - 4, bitLength & 0xffffffff, false);
+
+        let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+
+        for (let i = 0; i < padded.length; i += 64) {
+            const w = new Uint32Array(80);
+            for (let j = 0; j < 16; j++) w[j] = view.getUint32(i + j * 4, false);
+            for (let j = 16; j < 80; j++) {
+                w[j] = rotateLeft(w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1);
+            }
+
+            let a = h0, b = h1, c = h2, d = h3, e = h4;
+
+            for (let j = 0; j < 80; j++) {
+                let f, k;
+                if (j < 20) {
+                    f = (b & c) | (~b & d);
+                    k = 0x5A827999;
+                } else if (j < 40) {
+                    f = b ^ c ^ d;
+                    k = 0x6ED9EBA1;
+                } else if (j < 60) {
+                    f = (b & c) | (b & d) | (c & d);
+                    k = 0x8F1BBCDC;
+                } else {
+                    f = b ^ c ^ d;
+                    k = 0xCA62C1D6;
+                }
+
+                const temp = (rotateLeft(a, 5) + f + e + k + w[j]) >>> 0;
+                e = d;
+                d = c;
+                c = rotateLeft(b, 30);
+                b = a;
+                a = temp;
+            }
+
+            h0 = (h0 + a) >>> 0;
+            h1 = (h1 + b) >>> 0;
+            h2 = (h2 + c) >>> 0;
+            h3 = (h3 + d) >>> 0;
+            h4 = (h4 + e) >>> 0;
+        }
+
+        const output = new Uint8Array(20);
+        const outView = new DataView(output.buffer);
+        outView.setUint32(0, h0, false);
+        outView.setUint32(4, h1, false);
+        outView.setUint32(8, h2, false);
+        outView.setUint32(12, h3, false);
+        outView.setUint32(16, h4, false);
+        
+        return output;
+    }
+
+    // SHA-256 Implementation
+    const K256 = new Uint32Array([
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ]);
+
+    function sha256(message) {
+        const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+        const ch = (x, y, z) => (x & y) ^ (~x & z);
+        const maj = (x, y, z) => (x & y) ^ (x & z) ^ (y & z);
+        const sigma0 = (x) => rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
+        const sigma1 = (x) => rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
+        const gamma0 = (x) => rotr(x, 7) ^ rotr(x, 18) ^ (x >>> 3);
+        const gamma1 = (x) => rotr(x, 17) ^ rotr(x, 19) ^ (x >>> 10);
+
+        const msg = strToBytes(message);
+        const bitLength = msg.length * 8;
+        const paddedLength = (((msg.length + 8) >>> 6) + 1) * 64;
+        const padded = new Uint8Array(paddedLength);
+        padded.set(msg);
+        padded[msg.length] = 0x80;
+        
+        const view = new DataView(padded.buffer);
+        view.setUint32(paddedLength - 4, bitLength, false);
+
+        let H = new Uint32Array([
+            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+            0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+        ]);
+
+        for (let i = 0; i < paddedLength; i += 64) {
+            const w = new Uint32Array(64);
+            for (let j = 0; j < 16; j++) w[j] = view.getUint32(i + j * 4, false);
+            for (let j = 16; j < 64; j++) {
+                w[j] = (gamma1(w[j - 2]) + w[j - 7] + gamma0(w[j - 15]) + w[j - 16]) >>> 0;
+            }
+
+            let [a, b, c, d, e, f, g, h] = H;
+
+            for (let j = 0; j < 64; j++) {
+                const t1 = (h + sigma1(e) + ch(e, f, g) + K256[j] + w[j]) >>> 0;
+                const t2 = (sigma0(a) + maj(a, b, c)) >>> 0;
+                h = g;
+                g = f;
+                f = e;
+                e = (d + t1) >>> 0;
+                d = c;
+                c = b;
+                b = a;
+                a = (t1 + t2) >>> 0;
+            }
+
+            H[0] = (H[0] + a) >>> 0;
+            H[1] = (H[1] + b) >>> 0;
+            H[2] = (H[2] + c) >>> 0;
+            H[3] = (H[3] + d) >>> 0;
+            H[4] = (H[4] + e) >>> 0;
+            H[5] = (H[5] + f) >>> 0;
+            H[6] = (H[6] + g) >>> 0;
+            H[7] = (H[7] + h) >>> 0;
+        }
+
+        const output = new Uint8Array(32);
+        const outView = new DataView(output.buffer);
+        for (let i = 0; i < 8; i++) {
+            outView.setUint32(i * 4, H[i], false);
+        }
+        return output;
+    }
+
+    // SHA-224 Implementation
+    function sha224(message) {
+        const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+        const ch = (x, y, z) => (x & y) ^ (~x & z);
+        const maj = (x, y, z) => (x & y) ^ (x & z) ^ (y & z);
+        const sigma0 = (x) => rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
+        const sigma1 = (x) => rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
+        const gamma0 = (x) => rotr(x, 7) ^ rotr(x, 18) ^ (x >>> 3);
+        const gamma1 = (x) => rotr(x, 17) ^ rotr(x, 19) ^ (x >>> 10);
+
+        const msg = strToBytes(message);
+        const bitLength = msg.length * 8;
+        const paddedLength = (((msg.length + 8) >>> 6) + 1) * 64;
+        const padded = new Uint8Array(paddedLength);
+        padded.set(msg);
+        padded[msg.length] = 0x80;
+        
+        const view = new DataView(padded.buffer);
+        view.setUint32(paddedLength - 4, bitLength, false);
+
+        let H = new Uint32Array([
+            0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
+            0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
+        ]);
+
+        for (let i = 0; i < paddedLength; i += 64) {
+            const w = new Uint32Array(64);
+            for (let j = 0; j < 16; j++) w[j] = view.getUint32(i + j * 4, false);
+            for (let j = 16; j < 64; j++) {
+                w[j] = (gamma1(w[j - 2]) + w[j - 7] + gamma0(w[j - 15]) + w[j - 16]) >>> 0;
+            }
+
+            let [a, b, c, d, e, f, g, h] = H;
+
+            for (let j = 0; j < 64; j++) {
+                const t1 = (h + sigma1(e) + ch(e, f, g) + K256[j] + w[j]) >>> 0;
+                const t2 = (sigma0(a) + maj(a, b, c)) >>> 0;
+                h = g;
+                g = f;
+                f = e;
+                e = (d + t1) >>> 0;
+                d = c;
+                c = b;
+                b = a;
+                a = (t1 + t2) >>> 0;
+            }
+
+            H[0] = (H[0] + a) >>> 0;
+            H[1] = (H[1] + b) >>> 0;
+            H[2] = (H[2] + c) >>> 0;
+            H[3] = (H[3] + d) >>> 0;
+            H[4] = (H[4] + e) >>> 0;
+            H[5] = (H[5] + f) >>> 0;
+            H[6] = (H[6] + g) >>> 0;
+            H[7] = (H[7] + h) >>> 0;
+        }
+
+        const output = new Uint8Array(28);
+        const outView = new DataView(output.buffer);
+        for (let i = 0; i < 7; i++) {
+            outView.setUint32(i * 4, H[i], false);
+        }
+        return output;
+    }
+
+    // SHA-512 Implementation
+    const K512 = [
+        0x428a2f98d728ae22n, 0x7137449123ef65cdn, 0xb5c0fbcfec4d3b2fn, 0xe9b5dba58189dbbcn,
+        0x3956c25bf348b538n, 0x59f111f1b605d019n, 0x923f82a4af194f9bn, 0xab1c5ed5da6d8118n,
+        0xd807aa98a3030242n, 0x12835b0145706fben, 0x243185be4ee4b28cn, 0x550c7dc3d5ffb4e2n,
+        0x72be5d74f27b896fn, 0x80deb1fe3b1696b1n, 0x9bdc06a725c71235n, 0xc19bf174cf692694n,
+        0xe49b69c19ef14ad2n, 0xefbe4786384f25e3n, 0x0fc19dc68b8cd5b5n, 0x240ca1cc77ac9c65n,
+        0x2de92c6f592b0275n, 0x4a7484aa6ea6e483n, 0x5cb0a9dcbd41fbd4n, 0x76f988da831153b5n,
+        0x983e5152ee66dfabn, 0xa831c66d2db43210n, 0xb00327c898fb213fn, 0xbf597fc7beef0ee4n,
+        0xc6e00bf33da88fc2n, 0xd5a79147930aa725n, 0x06ca6351e003826fn, 0x142929670a0e6e70n,
+        0x27b70a8546d22ffcn, 0x2e1b21385c26c926n, 0x4d2c6dfc5ac42aedn, 0x53380d139d95b3dfn,
+        0x650a73548baf63den, 0x766a0abb3c77b2a8n, 0x81c2c92e47edaee6n, 0x92722c851482353bn,
+        0xa2bfe8a14cf10364n, 0xa81a664bbc423001n, 0xc24b8b70d0f89791n, 0xc76c51a30654be30n,
+        0xd192e819d6ef5218n, 0xd69906245565a910n, 0xf40e35855771202an, 0x106aa07032bbd1b8n,
+        0x19a4c116b8d2d0c8n, 0x1e376c085141ab53n, 0x2748774cdf8eeb99n, 0x34b0bcb5e19b48a8n,
+        0x391c0cb3c5c95a63n, 0x4ed8aa4ae3418acbn, 0x5b9cca4f7763e373n, 0x682e6ff3d6b2b8a3n,
+        0x748f82ee5defb2fcn, 0x78a5636f43172f60n, 0x84c87814a1f0ab72n, 0x8cc702081a6439ecn,
+        0x90befffa23631e28n, 0xa4506cebde82bde9n, 0xbef9a3f7b2c67915n, 0xc67178f2e372532bn,
+        0xca273eceea26619cn, 0xd186b8c721c0c207n, 0xeada7dd6cde0eb1en, 0xf57d4f7fee6ed178n,
+        0x06f067aa72176fban, 0x0a637dc5a2c898a6n, 0x113f9804bef90daen, 0x1b710b35131c471bn,
+        0x28db77f523047d84n, 0x32caab7b40c72493n, 0x3c9ebe0a15c9bebcn, 0x431d67c49c100d4cn,
+        0x4cc5d4becb3e42b6n, 0x597f299cfc657e2an, 0x5fcb6fab3ad6faecn, 0x6c44198c4a475817n
+    ];
+
+    function sha512(message) {
+        const rotr64 = (x, n) => (x >> n) | (x << (64n - n));
+        const ch64 = (x, y, z) => (x & y) ^ (~x & z);
+        const maj64 = (x, y, z) => (x & y) ^ (x & z) ^ (y & z);
+        const sigma0_64 = (x) => rotr64(x, 28n) ^ rotr64(x, 34n) ^ rotr64(x, 39n);
+        const sigma1_64 = (x) => rotr64(x, 14n) ^ rotr64(x, 18n) ^ rotr64(x, 41n);
+        const gamma0_64 = (x) => rotr64(x, 1n) ^ rotr64(x, 8n) ^ (x >> 7n);
+        const gamma1_64 = (x) => rotr64(x, 19n) ^ rotr64(x, 61n) ^ (x >> 6n);
+
+        const msg = strToBytes(message);
+        const bitLength = BigInt(msg.length * 8);
+        const paddedLength = Number((((BigInt(msg.length) + 17n) >> 7n) + 1n) * 128n);
+        const padded = new Uint8Array(paddedLength);
+        padded.set(msg);
+        padded[msg.length] = 0x80;
+        
+        const view = new DataView(padded.buffer);
+        view.setBigUint64(paddedLength - 8, bitLength, false);
+
+        let H = [
+            0x6a09e667f3bcc908n, 0xbb67ae8584caa73bn, 0x3c6ef372fe94f82bn, 0xa54ff53a5f1d36f1n,
+            0x510e527fade682d1n, 0x9b05688c2b3e6c1fn, 0x1f83d9abfb41bd6bn, 0x5be0cd19137e2179n
+        ];
+
+        for (let i = 0; i < paddedLength; i += 128) {
+            const w = new Array(80);
+            for (let j = 0; j < 16; j++) w[j] = view.getBigUint64(i + j * 8, false);
+            for (let j = 16; j < 80; j++) {
+                w[j] = (gamma1_64(w[j - 2]) + w[j - 7] + gamma0_64(w[j - 15]) + w[j - 16]) & 0xffffffffffffffffn;
+            }
+
+            let [a, b, c, d, e, f, g, h] = H;
+
+            for (let j = 0; j < 80; j++) {
+                const t1 = (h + sigma1_64(e) + ch64(e, f, g) + K512[j] + w[j]) & 0xffffffffffffffffn;
+                const t2 = (sigma0_64(a) + maj64(a, b, c)) & 0xffffffffffffffffn;
+                h = g;
+                g = f;
+                f = e;
+                e = (d + t1) & 0xffffffffffffffffn;
+                d = c;
+                c = b;
+                b = a;
+                a = (t1 + t2) & 0xffffffffffffffffn;
+            }
+
+            H[0] = (H[0] + a) & 0xffffffffffffffffn;
+            H[1] = (H[1] + b) & 0xffffffffffffffffn;
+            H[2] = (H[2] + c) & 0xffffffffffffffffn;
+            H[3] = (H[3] + d) & 0xffffffffffffffffn;
+            H[4] = (H[4] + e) & 0xffffffffffffffffn;
+            H[5] = (H[5] + f) & 0xffffffffffffffffn;
+            H[6] = (H[6] + g) & 0xffffffffffffffffn;
+            H[7] = (H[7] + h) & 0xffffffffffffffffn;
+        }
+
+        const output = new Uint8Array(64);
+        const outView = new DataView(output.buffer);
+        for (let i = 0; i < 8; i++) {
+            outView.setBigUint64(i * 8, H[i], false);
+        }
+        return output;
+    }
+
+    // SHA-384 Implementation
+    function sha384(message) {
+        const rotr64 = (x, n) => (x >> n) | (x << (64n - n));
+        const ch64 = (x, y, z) => (x & y) ^ (~x & z);
+        const maj64 = (x, y, z) => (x & y) ^ (x & z) ^ (y & z);
+        const sigma0_64 = (x) => rotr64(x, 28n) ^ rotr64(x, 34n) ^ rotr64(x, 39n);
+        const sigma1_64 = (x) => rotr64(x, 14n) ^ rotr64(x, 18n) ^ rotr64(x, 41n);
+        const gamma0_64 = (x) => rotr64(x, 1n) ^ rotr64(x, 8n) ^ (x >> 7n);
+        const gamma1_64 = (x) => rotr64(x, 19n) ^ rotr64(x, 61n) ^ (x >> 6n);
+
+        const msg = strToBytes(message);
+        const bitLength = BigInt(msg.length * 8);
+        const paddedLength = Number((((BigInt(msg.length) + 17n) >> 7n) + 1n) * 128n);
+        const padded = new Uint8Array(paddedLength);
+        padded.set(msg);
+        padded[msg.length] = 0x80;
+        
+        const view = new DataView(padded.buffer);
+        view.setBigUint64(paddedLength - 8, bitLength, false);
+
+        let H = [
+            0xcbbb9d5dc1059ed8n, 0x629a292a367cd507n, 0x9159015a3070dd17n, 0x152fecd8f70e5939n,
+            0x67332667ffc00b31n, 0x8eb44a8768581511n, 0xdb0c2e0d64f98fa7n, 0x47b5481dbefa4fa4n
+        ];
+
+        for (let i = 0; i < paddedLength; i += 128) {
+            const w = new Array(80);
+            for (let j = 0; j < 16; j++) w[j] = view.getBigUint64(i + j * 8, false);
+            for (let j = 16; j < 80; j++) {
+                w[j] = (gamma1_64(w[j - 2]) + w[j - 7] + gamma0_64(w[j - 15]) + w[j - 16]) & 0xffffffffffffffffn;
+            }
+
+            let [a, b, c, d, e, f, g, h] = H;
+
+            for (let j = 0; j < 80; j++) {
+                const t1 = (h + sigma1_64(e) + ch64(e, f, g) + K512[j] + w[j]) & 0xffffffffffffffffn;
+                const t2 = (sigma0_64(a) + maj64(a, b, c)) & 0xffffffffffffffffn;
+                h = g;
+                g = f;
+                f = e;
+                e = (d + t1) & 0xffffffffffffffffn;
+                d = c;
+                c = b;
+                b = a;
+                a = (t1 + t2) & 0xffffffffffffffffn;
+            }
+
+            H[0] = (H[0] + a) & 0xffffffffffffffffn;
+            H[1] = (H[1] + b) & 0xffffffffffffffffn;
+            H[2] = (H[2] + c) & 0xffffffffffffffffn;
+            H[3] = (H[3] + d) & 0xffffffffffffffffn;
+            H[4] = (H[4] + e) & 0xffffffffffffffffn;
+            H[5] = (H[5] + f) & 0xffffffffffffffffn;
+            H[6] = (H[6] + g) & 0xffffffffffffffffn;
+            H[7] = (H[7] + h) & 0xffffffffffffffffn;
+        }
+
+        const output = new Uint8Array(48);
+        const outView = new DataView(output.buffer);
+        for (let i = 0; i < 6; i++) {
+            outView.setBigUint64(i * 8, H[i], false);
+        }
+        return output;
+    }
+
+    // ==================== SHA-3 IMPLEMENTATION WITH ORIGINAL KECCAK PADDING ====================
+
+    // Keccak implementation with original Keccak padding (0x01)
+    class Keccak {
+        constructor(bits) {
+            this.bits = bits;
+            this.blockSize = (1600 - bits * 2) / 8;
+            this.state = new Array(25).fill(0n);
+            this.buffer = [];
+        }
+
+        keccakF() {
+            const R = [
+                [0, 36, 3, 41, 18],
+                [1, 44, 10, 45, 2],
+                [62, 6, 43, 15, 61],
+                [28, 55, 25, 21, 56],
+                [27, 20, 39, 8, 14]
+            ];
+
+            const RC = [
+                0x0000000000000001n, 0x0000000000008082n, 0x800000000000808an, 0x8000000080008000n,
+                0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
+                0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
+                0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
+                0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
+                0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
+            ];
+
+            const MASK64 = 0xFFFFFFFFFFFFFFFFn;
+
+            for (let round = 0; round < 24; round++) {
+                // θ step
+                const C = new Array(5).fill(0n);
+                for (let x = 0; x < 5; x++) {
+                    C[x] = this.state[x] ^ this.state[x + 5] ^ this.state[x + 10] ^ this.state[x + 15] ^ this.state[x + 20];
+                }
+
+                const D = new Array(5).fill(0n);
+                for (let x = 0; x < 5; x++) {
+                    const t = C[(x + 1) % 5];
+                    D[x] = C[(x + 4) % 5] ^ (((t << 1n) | (t >> 63n)) & MASK64);
+                }
+
+                for (let x = 0; x < 5; x++) {
+                    for (let y = 0; y < 5; y++) {
+                        this.state[x + 5 * y] = (this.state[x + 5 * y] ^ D[x]) & MASK64;
+                    }
+                }
+
+                // ρ and π steps
+                const B = new Array(25).fill(0n);
+                for (let x = 0; x < 5; x++) {
+                    for (let y = 0; y < 5; y++) {
+                        const index = x + 5 * y;
+                        const rot = BigInt(R[x][y]);
+                        B[y + 5 * ((2 * x + 3 * y) % 5)] = 
+                            ((this.state[index] << rot) | (this.state[index] >> (64n - rot))) & MASK64;
+                    }
+                }
+
+                // χ step
+                for (let x = 0; x < 5; x++) {
+                    for (let y = 0; y < 5; y++) {
+                        const index = x + 5 * y;
+                        const a = B[index];
+                        const b = B[(x + 1) % 5 + 5 * y];
+                        const c = B[(x + 2) % 5 + 5 * y];
+                        this.state[index] = (a ^ ((~b) & c)) & MASK64;
+                    }
+                }
+
+                // ι step
+                this.state[0] = (this.state[0] ^ RC[round]) & MASK64;
+            }
+        }
+
+        update(data) {
+            const bytes = new TextEncoder().encode(data);
+            
+            for (let i = 0; i < bytes.length; i++) {
+                this.buffer.push(bytes[i]);
+                if (this.buffer.length === this.blockSize) {
+                    this.absorb();
+                }
+            }
+        }
+
+        absorb() {
+            const MASK64 = 0xFFFFFFFFFFFFFFFFn;
+            for (let i = 0; i < this.blockSize; i++) {
+                const lane = Math.floor(i / 8);
+                const shift = BigInt((i % 8) * 8);
+                const byte = i < this.buffer.length ? BigInt(this.buffer[i]) : 0n;
+                this.state[lane] = (this.state[lane] ^ (byte << shift)) & MASK64;
+            }
+            
+            this.keccakF();
+            this.buffer = [];
+        }
+
+        finalize() {
+            // Original Keccak padding: append 0x01 followed by 0x80
+            this.buffer.push(0x01);
+            
+            // Fill the rest of the block with zeros except for the last byte
+            while (this.buffer.length < this.blockSize - 1) {
+                this.buffer.push(0x00);
+            }
+            
+            // Set the last byte to 0x80
+            this.buffer.push(0x80);
+            
+            this.absorb();
+
+            // Squeeze
+            const outputBytes = this.bits / 8;
+            const output = new Uint8Array(outputBytes);
+            let outputLength = 0;
+
+            while (outputLength < outputBytes) {
+                for (let i = 0; i < this.blockSize && outputLength < outputBytes; i++) {
+                    const lane = Math.floor(i / 8);
+                    const shift = BigInt((i % 8) * 8);
+                    output[outputLength++] = Number((this.state[lane] >> shift) & 0xFFn);
+                }
+                
+                if (outputLength < outputBytes) {
+                    this.keccakF();
+                }
+            }
+
+            return output;
+        }
+
+        static hash(message, bits) {
+            const keccak = new Keccak(bits);
+            keccak.update(message);
+            return keccak.finalize();
+        }
+    }
+
+    // SHA-3 family functions using Keccak with original padding
+    function sha3_224(message) {
+        return Keccak.hash(message, 224);
+    }
+
+    function sha3_256(message) {
+        return Keccak.hash(message, 256);
+    }
+
+    function sha3_384(message) {
+        return Keccak.hash(message, 384);
+    }
+
+    function sha3_512(message) {
+        return Keccak.hash(message, 512);
+    }
+
+    // ==================== MAIN APPLICATION LOGIC ====================
+
+    function generateHash(text, algorithm) {
+        let hashBytes;
+        
+        switch (algorithm) {
+            case 'SHA-1': hashBytes = sha1(text); break;
+            case 'SHA-224': hashBytes = sha224(text); break;
+            case 'SHA-256': hashBytes = sha256(text); break;
+            case 'SHA-384': hashBytes = sha384(text); break;
+            case 'SHA-512': hashBytes = sha512(text); break;
+            case 'SHA3-224': hashBytes = sha3_224(text); break;
+            case 'SHA3-256': hashBytes = sha3_256(text); break;
+            case 'SHA3-384': hashBytes = sha3_384(text); break;
+            case 'SHA3-512': hashBytes = sha3_512(text); break;
+            default: hashBytes = sha256(text);
+        }
+        
+        return bytesToHex(hashBytes);
+    }
+
+    function extractEmails(text) {
+        const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+        return text.match(emailRegex) || [];
+    }
+
+    function computeHash() {
+        const text = elements.input.value.trim();
+        
+        if (!text) {
+            elements.output.value = "Hash result will appear here...";
+            hideComparison();
+            return;
+        }
+
+        elements.processing.style.display = "inline-block";
+        
+        setTimeout(() => {
+            try {
+                const algorithm = elements.algorithm.value;
+                const useUppercase = elements.uppercase.checked;
+                const useSalt = elements.includeSalt.checked;
+                const salt = useSalt ? elements.saltValue.value : "";
+                
+        if (elements.bulkMode.checked) {
+          // Try email-based bulk hashing first
+          const emails = extractEmails(text);
+          const results = [];
+
+          if (emails.length > 0) {
+            for (const email of emails) {
+              const dataToHash = salt + email;
+              let hashResult = generateHash(dataToHash, algorithm);
+              if (useUppercase) hashResult = hashResult.toUpperCase();
+              results.push(`${email}: ${hashResult}`);
+            }
+          } else {
+            // Fallback: split file/text into lines and/or cell tokens (tabs/commas)
+            // This handles Excel content converted to text (sheet rows joined by "\t")
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+            if (lines.length === 0) {
+              elements.output.value = "No valid items found for bulk hashing.";
+              return;
+            }
+
+            for (const line of lines) {
+              // If a line contains multiple columns (tabs or commas), hash each column token.
+              const tokens = line.split(/\t|,/).map(t => t.trim()).filter(t => t.length > 0);
+
+              if (tokens.length > 1) {
+                for (const token of tokens) {
+                  const dataToHash = salt + token;
+                  let hashResult = generateHash(dataToHash, algorithm);
+                  if (useUppercase) hashResult = hashResult.toUpperCase();
+                  results.push(`${token}: ${hashResult}`);
+                }
+              } else {
+                // Single token/line -> hash the whole line
+                const dataToHash = salt + line;
+                let hashResult = generateHash(dataToHash, algorithm);
+                if (useUppercase) hashResult = hashResult.toUpperCase();
+                results.push(`${line}: ${hashResult}`);
+              }
+            }
+          }
+
+          elements.output.value = results.join('\n');
+        } else {
+                    const dataToHash = salt + text;
+                    let hashResult = generateHash(dataToHash, algorithm);
+
+                    // FIX: Apply uppercase transformation properly
+                    if (useUppercase) {
+                        hashResult = hashResult.toUpperCase();
+                    }
+
+                    elements.output.value = hashResult;
+                    
+                    if (elements.hashComparison.checked && elements.compareHashValue.value.trim()) {
+                        const compareHash = elements.compareHashValue.value.trim();
+                        const isMatch = hashResult.toLowerCase() === compareHash.toLowerCase();
+                        showComparison(isMatch);
+                    } else {
+                        hideComparison();
+                    }
+                }
+                
+            } catch (error) {
+                console.error("Error:", error);
+                elements.output.value = "Error calculating hash: " + error.message;
+                hideComparison();
+            } finally {
+                elements.processing.style.display = "none";
+            }
+        }, 100);
+    }
+
+    let debounceTimer;
+    function debounceCompute() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(computeHash, 300);
+    }
+
+    function showComparison(isMatch) {
+        elements.comparisonAlert.style.display = "block";
+        elements.comparisonAlert.className = isMatch ? "alert alert-success" : "alert alert-danger";
+        elements.comparisonAlert.innerHTML = isMatch 
+            ? '<i class="fas fa-check-circle"></i> Hashes match!' 
+            : '<i class="fas fa-times-circle"></i> Hashes do NOT match!';
+    }
+
+    function hideComparison() {
+        elements.comparisonAlert.style.display = "none";
+    }
+
+    // ==================== EVENT LISTENERS ====================
+
+    elements.themeToggle.addEventListener('click', toggleTheme);
+    
+    elements.input.addEventListener("input", function() {
+        if (elements.liveUpdate.checked) {
+            debounceCompute();
+        }
+    });
+
+    // FIX: Add event listener for uppercase checkbox
+    elements.uppercase.addEventListener("change", function() {
+        if (elements.liveUpdate.checked && elements.input.value.trim()) {
+            computeHash();
+        }
+    });
+
+    elements.copyBtn.addEventListener("click", function() {
+        navigator.clipboard.writeText(elements.output.value).then(() => {
+            const originalHTML = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                this.innerHTML = originalHTML;
+            }, 2000);
+        });
+    });
+
+    elements.downloadBtn.addEventListener("click", function() {
+        const blob = new Blob([elements.output.value], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `hash_${elements.algorithm.value}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    elements.pasteBtn.addEventListener("click", async function() {
+        try {
+            const text = await navigator.clipboard.readText();
+            elements.input.value = text;
+            computeHash();
+        } catch (error) {
+            alert("Paste failed. Please paste manually.");
+        }
+    });
+
+    elements.uploadBtn.addEventListener("click", function() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".txt,.csv,.json,.pdf,.doc,.docx,.xlsx,.xls";
+        
+        input.onchange = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            await handleFileUpload(file);
+        };
+        
+        input.click();
+    });
+
+    elements.includeSalt.addEventListener("change", function() {
+        elements.saltContainer.style.display = this.checked ? 'block' : 'none';
+        if (elements.liveUpdate.checked && elements.input.value.trim()) {
+            computeHash();
+        }
+    });
+
+    elements.hashComparison.addEventListener("change", function() {
+        elements.compareContainer.style.display = this.checked ? 'block' : 'none';
+        if (!this.checked) {
+            hideComparison();
+        } else if (elements.liveUpdate.checked && elements.input.value.trim()) {
+            computeHash();
+        }
+    });
+
+    elements.compareHashValue.addEventListener("input", function() {
+        if (elements.liveUpdate.checked && elements.input.value.trim()) {
+            debounceCompute();
+        }
+    });
+
+    document.querySelectorAll('.dropdown-item[data-value]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const value = this.getAttribute('data-value');
+            const text = this.textContent;
+            elements.algoDisplay.textContent = text;
+            elements.algorithm.value = value;
+            if (elements.liveUpdate.checked && elements.input.value.trim()) {
+                computeHash();
+            }
+        });
+    });
+
+    // Initialize theme
+    initTheme();
+});
+</script>
+</body>
+</html>
