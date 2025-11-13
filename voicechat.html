@@ -1,1 +1,1137 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Voice Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .mic-container {
+            margin: 30px 0;
+            position: relative;
+        }
+
+        #micBtn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            color: white;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        #micBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        #micBtn.listening {
+            background: linear-gradient(45deg, #ff4b4b, #ff7676);
+            animation: pulse 2s infinite, listeningGlow 3s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes listeningGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 75, 75, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 75, 75, 0.8); }
+        }
+
+        #micBtn svg {
+            width: 35px;
+            height: 35px;
+        }
+
+        .timer {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff4b4b;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        #status, #result {
+            margin: 20px 0;
+            font-size: 18px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #result {
+            color: #ffd166;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #4ade80;
+            animation: success 0.5s ease;
+        }
+
+        @keyframes success {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        .transcript {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            text-align: left;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .instructions {
+            margin-top: 25px;
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .examples {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .examples h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .example-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .example {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .recent-domains {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .recent-domains h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .domain-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .domain-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .domain-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.confirm {
+            background: #ff4b4b;
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Advanced Voice Assistant</h1>
+        <p class="subtitle">Control websites, files, and system operations with your voice! Listens for 5 seconds</p>
+        
+        <div class="mic-container">
+            <button id="micBtn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" fill="white"/>
+                </svg>
+                Start Listening
+            </button>
+        </div>
+        
+        <div id="status">Click the microphone and speak your command</div>
+        <div id="result">Ready to listen...</div>
+        
+        <div class="transcript" id="transcript">
+            <strong>Live Transcript:</strong><br>
+            <span id="transcriptText">Waiting for speech...</span>
+        </div>
+        
+        <div class="examples">
+            <h3>Try saying:</h3>
+            <div class="example-list">
+                <div class="example" onclick="speakExample('open youtube.com')">"open youtube.com"</div>
+                <div class="example" onclick="speakExample('search for prospect precise')">"search for prospect precise"</div>
+                <div class="example" onclick="speakExample('show me my downloads')">"show me my downloads"</div>
+                <div class="example" onclick="speakExample('delete file example.txt')">"delete file example.txt"</div>
+                <div class="example" onclick="speakExample('open dashboard')">"open dashboard"</div>
+            </div>
+        </div>
+
+        <div class="recent-domains" id="recentDomains" style="display: none;">
+            <h3>Recently Opened:</h3>
+            <div class="domain-list" id="domainList"></div>
+        </div>
+        
+        <div class="instructions">
+            <p>🎯 <strong>Websites:</strong> "open youtube.com", "go to google.co.in", "wikipedia.org", etc.</p>
+            <p>🔍 <strong>Search:</strong> "search for prospect precise", "find koinet media", etc.</p>
+            <p>📁 <strong>Files:</strong> "show downloads", "delete file example.txt", "open dashboard"</p>
+            <p>⏱️ <strong>5-second listening:</strong> Keep speaking - it will detect multiple commands</p>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h2>Confirm Action</h2>
+            <p id="modalMessage">Are you sure you want to perform this action?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm" id="confirmAction">Yes</button>
+                <button class="modal-btn cancel" id="cancelAction">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        recognition.maxAlternatives = 3;
+
+        const micBtn = document.getElementById('micBtn');
+        const statusEl = document.getElementById('status');
+        const resultEl = document.getElementById('result');
+        const transcriptEl = document.getElementById('transcriptText');
+        const recentDomainsEl = document.getElementById('recentDomains');
+        const domainListEl = document.getElementById('domainList');
+        const modal = document.getElementById('confirmationModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const confirmAction = document.getElementById('confirmAction');
+        const cancelAction = document.getElementById('cancelAction');
+
+        let isListening = false;
+        let listenTimeout;
+        let recentDomains = JSON.parse(localStorage.getItem('recentDomains')) || [];
+        let pendingAction = null;
+
+        // Update recent domains display
+        function updateRecentDomains() {
+            if (recentDomains.length > 0) {
+                recentDomainsEl.style.display = 'block';
+                domainListEl.innerHTML = '';
+                recentDomains.slice(0, 6).forEach(domain => {
+                    const domainItem = document.createElement('div');
+                    domainItem.className = 'domain-item';
+                    domainItem.textContent = domain;
+                    domainItem.onclick = () => openWebsite(domain);
+                    domainListEl.appendChild(domainItem);
+                });
+            }
+        }
+
+        // Add domain to recent list
+        function addToRecentDomains(domain) {
+            recentDomains = recentDomains.filter(d => d !== domain);
+            recentDomains.unshift(domain);
+            if (recentDomains.length > 10) {
+                recentDomains = recentDomains.slice(0, 10);
+            }
+            localStorage.setItem('recentDomains', JSON.stringify(recentDomains));
+            updateRecentDomains();
+        }
+
+        // Enhanced command processing
+        function processCommand(text) {
+            console.log("Processing command:", text);
+            
+            const lowerText = text.toLowerCase().trim();
+            
+            // Website opening
+            if (lowerText.includes('open ') || lowerText.includes('go to ') || 
+                lowerText.includes('visit ') || /[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(lowerText)) {
+                const domain = extractDomain(text);
+                if (domain) {
+                    if (domain.type === 'domain') {
+                        openWebsite(domain.value);
+                    } else if (domain.type === 'search') {
+                        performSearch(domain.value);
+                    }
+                    return;
+                }
+            }
+            
+            // Search commands
+            if (lowerText.includes('search for ') || lowerText.includes('find ') || 
+                lowerText.includes('look up ')) {
+                const query = lowerText.replace(/(search for|find|look up)\s+/gi, '').trim();
+                if (query) {
+                    performSearch(query);
+                    return;
+                }
+            }
+            
+            // File operations
+            if (lowerText.includes('download') || lowerText.includes('downloads')) {
+                showDownloads();
+                return;
+            }
+            
+            if (lowerText.includes('delete file ') || lowerText.includes('remove file ')) {
+                const fileName = lowerText.replace(/(delete file|remove file)\s+/gi, '').trim();
+                if (fileName) {
+                    showDeleteConfirmation(fileName);
+                    return;
+                }
+            }
+            
+            if (lowerText.includes('dashboard')) {
+                openDashboard();
+                return;
+            }
+            
+            // If no specific command detected, treat as search
+            performSearch(lowerText);
+        }
+
+        // Enhanced domain extraction with space detection
+        function extractDomain(text) {
+            console.log("Processing:", text);
+            
+            // Convert to lowercase and clean
+            const lowerText = text.toLowerCase().trim();
+            
+            // Remove common phrases gently
+            let cleanedText = lowerText
+                .replace(/(^|\s)(open|go to|visit|navigate to|take me to|show me|launch|please|website|site)\s+/gi, ' ')
+                .replace(/\s+(please|now|page|webpage|dot)\s*/gi, ' ')
+                .trim();
+
+            // Handle "dot" notation
+            cleanedText = cleanedText.replace(/\s+dot\s+/gi, '.');
+
+            // Check for domains with spaces before TLD (e.g., "prospect precise.com")
+            const spacedDomainRegex = /([a-zA-Z0-9](?:[a-zA-Z0-9-\s]{0,61}[a-zA-Z0-9])?\.(?:[a-zA-Z]{2,}|co\.[a-zA-Z]{2}|com\.[a-zA-Z]{2}|org\.[a-zA-Z]{2}|net\.[a-zA-Z]{2}|io|in|uk|us|ca|au|de|fr|jp|cn|ru|br|mx))(?:\s|$|\.|,)/gi;
+            
+            const spacedMatches = cleanedText.match(spacedDomainRegex);
+            if (spacedMatches && spacedMatches.length > 0) {
+                // Remove spaces from the domain name but keep the TLD
+                let domain = spacedMatches[0].replace(/[.,\s]+$/, '').trim();
+                domain = domain.replace(/\s+/g, ''); // Remove all spaces from the domain
+                console.log("Found spaced domain:", domain);
+                return { type: 'domain', value: domain };
+            }
+
+            // Enhanced domain regex - matches ANY valid domain including new TLDs
+            const domainRegex = /([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.(?:[a-zA-Z]{2,}|co\.[a-zA-Z]{2}|com\.[a-zA-Z]{2}|org\.[a-zA-Z]{2}|net\.[a-zA-Z]{2}|io|in|uk|us|ca|au|de|fr|jp|cn|ru|br|mx))(?:\s|$|\.|,)/gi;
+            
+            const matches = cleanedText.match(domainRegex);
+            if (matches && matches.length > 0) {
+                const domain = matches[0].replace(/[.,\s]+$/, '').trim();
+                console.log("Found domain:", domain);
+                return { type: 'domain', value: domain };
+            }
+
+            // Check if the text contains spaces (indicating a search query)
+            const hasSpaces = /\s/.test(cleanedText);
+            
+            // If no domain found but text has no spaces, try to find website names without TLDs
+            if (!hasSpaces) {
+                const words = cleanedText.split(/\s+/);
+                for (let word of words) {
+                    const cleanWord = word.replace(/[^a-zA-Z0-9-]/g, '');
+                    if (cleanWord.length >= 2 && cleanWord.length <= 30 && /^[a-zA-Z0-9-]+$/.test(cleanWord)) {
+                        // Common websites mapping
+                                         const commonSites = {
+                            'youtube': 'youtube.com',
+                            'google': 'google.com',
+                            'facebook': 'facebook.com',
+                            'whatsapp': 'web.whatsapp.com',
+                            'instagram': 'instagram.com',
+                            'twitter': 'twitter.com',
+                            'x': 'x.com',
+                            'linkedin': 'linkedin.com',
+                            'wikipedia': 'wikipedia.org',
+                            'amazon': 'amazon.com',
+                            'flipkart': 'flipkart.com',
+                            'netflix': 'netflix.com',
+                            'prime': 'primevideo.com',
+                            'hotstar': 'hotstar.com',
+                            'gmail': 'gmail.com',
+                            'outlook': 'outlook.com',
+                            'reddit': 'reddit.com',
+                            'github': 'github.com',
+                            'stackoverflow': 'stackoverflow.com',
+                            'spotify': 'spotify.com',
+                            'yahoo': 'yahoo.com',
+                            'bing': 'bing.com',
+                            'msn': 'msn.com',
+                            'quora': 'quora.com',
+                            'pinterest': 'pinterest.com',
+                            'tumblr': 'tumblr.com',
+                            'wordpress': 'wordpress.com',
+                            'blogger': 'blogger.com',
+                            'medium': 'medium.com',
+                            'ted': 'ted.com',
+                            'dropbox': 'dropbox.com',
+                            'drive': 'drive.google.com',
+                            'maps': 'maps.google.com',
+                            'photos': 'photos.google.com',
+                            'calendar': 'calendar.google.com',
+                            'docs': 'docs.google.com',
+                            'sheets': 'sheets.google.com',
+                            'slides': 'slides.google.com',
+                            'paypal': 'paypal.com',
+                            'ebay': 'ebay.com',
+                            'aliexpress': 'aliexpress.com',
+                            'walmart': 'walmart.com',
+                            'target': 'target.com',
+                            'bestbuy': 'bestbuy.com',
+                            'hulu': 'hulu.com',
+                            'disney': 'disneyplus.com',
+                            'twitch': 'twitch.tv',
+                            'discord': 'discord.com',
+                            'zoom': 'zoom.us',
+                            'slack': 'slack.com',
+                            'trello': 'trello.com',
+                            'asana': 'asana.com',
+                            'notion': 'notion.so',
+                            'evernote': 'evernote.com',
+                            'icloud': 'icloud.com',
+                            'onedrive': 'onedrive.live.com',
+                            'mega': 'mega.nz',
+                            'weather': 'weather.com',
+                            'accuweather': 'accuweather.com',
+                            'cnn': 'cnn.com',
+                            'bbc': 'bbc.com',
+                            'nytimes': 'nytimes.com',
+                            'reuters': 'reuters.com',
+                            'forbes': 'forbes.com',
+                            'bloomberg': 'bloomberg.com',
+                            'economist': 'economist.com',
+                            'nationalgeographic': 'nationalgeographic.com',
+                            'history': 'history.com',
+                            'discovery': 'discovery.com',
+                            'espn': 'espn.com',
+                            'nba': 'nba.com',
+                            'nfl': 'nfl.com',
+                            'mlb': 'mlb.com',
+                            'nhl': 'nhl.com',
+                            'fifa': 'fifa.com',
+                            'olympics': 'olympics.com',
+                            'coursera': 'coursera.org',
+                            'udemy': 'udemy.com',
+                            'khanacademy': 'khanacademy.org',
+                            'edx': 'edx.org',
+                            'codecademy': 'codecademy.com',
+                            'freecodecamp': 'freecodecamp.org',
+                            'w3schools': 'w3schools.com',
+                            'leetcode': 'leetcode.com',
+                            'hackerrank': 'hackerrank.com',
+                            'codepen': 'codepen.io',
+                            'jsfiddle': 'jsfiddle.net',
+                            'gitlab': 'gitlab.com',
+                            'bitbucket': 'bitbucket.org',
+                            'docker': 'docker.com',
+                            'kubernetes': 'kubernetes.io',
+                            'aws': 'aws.amazon.com',
+                            'azure': 'azure.microsoft.com',
+                            'googlecloud': 'cloud.google.com',
+                            'ibm': 'ibm.com',
+                            'oracle': 'oracle.com',
+                            'salesforce': 'salesforce.com',
+                            'shopify': 'shopify.com',
+                            'squarespace': 'squarespace.com',
+                            'wix': 'wix.com',
+                            'weebly': 'weebly.com',
+                            'godaddy': 'godaddy.com',
+                            'namecheap': 'namecheap.com',
+                            'bluehost': 'bluehost.com',
+                            'hostgator': 'hostgator.com',
+                            'digitalocean': 'digitalocean.com',
+                            'linode': 'linode.com',
+                            'vultr': 'vultr.com',
+                            'heroku': 'heroku.com',
+                            'netlify': 'netlify.com',
+                            'vercel': 'vercel.com',
+                            'cloudflare': 'cloudflare.com',
+                            'akamai': 'akamai.com',
+                            'fastly': 'fastly.com',
+
+                            // Additional Social Media
+                            'snapchat': 'snapchat.com',
+                            'tiktok': 'tiktok.com',
+                            'telegram': 'telegram.org',
+                            'signal': 'signal.org',
+                            'wechat': 'wechat.com',
+                            'line': 'line.me',
+                            'viber': 'viber.com',
+                            'skype': 'skype.com',
+                            'meet': 'meet.google.com',
+                            'teams': 'teams.microsoft.com',
+                            'clubhouse': 'clubhouse.com',
+                            'threads': 'threads.net',
+
+                            // Additional E-commerce
+                            'etsy': 'etsy.com',
+                            'alibaba': 'alibaba.com',
+                            'zara': 'zara.com',
+                            'hm': 'hm.com',
+                            'nike': 'nike.com',
+                            'adidas': 'adidas.com',
+                            'myntra': 'myntra.com',
+                            'ajio': 'ajio.com',
+                            'nykaa': 'nykaa.com',
+                            'bigbasket': 'bigbasket.com',
+                            'grofers': 'grofers.com',
+                            'swiggy': 'swiggy.com',
+                            'zomato': 'zomato.com',
+                            'ubereats': 'ubereats.com',
+                            'doordash': 'doordash.com',
+                            'grubhub': 'grubhub.com',
+                            'justeat': 'justeat.com',
+                            'deliveroo': 'deliveroo.com',
+
+                            // Additional Streaming
+                            'hbonow': 'hbonow.com',
+                            'hulugans': 'hulu.com',
+                            'paramount': 'paramountplus.com',
+                            'peacock': 'peacocktv.com',
+                            'crunchyroll': 'crunchyroll.com',
+                            'funimation': 'funimation.com',
+                            'vimeo': 'vimeo.com',
+                            'dailymotion': 'dailymotion.com',
+                            'voot': 'voot.com',
+                            'sonyliv': 'sonyliv.com',
+                            'zee5': 'zee5.com',
+                            'altbalaji': 'altbalaji.com',
+
+                            // Additional News
+                            'guardian': 'theguardian.com',
+                            'washingtonpost': 'washingtonpost.com',
+                            'usatoday': 'usatoday.com',
+                            'foxnews': 'foxnews.com',
+                            'huffpost': 'huffpost.com',
+                            'businessinsider': 'businessinsider.com',
+                            'techcrunch': 'techcrunch.com',
+                            'mashable': 'mashable.com',
+                            'theverge': 'theverge.com',
+                            'wired': 'wired.com',
+                            'gizmodo': 'gizmodo.com',
+                            'engadget': 'engadget.com',
+                            'cnet': 'cnet.com',
+                            'arstechnica': 'arstechnica.com',
+
+                            // Additional Education
+                            'udacity': 'udacity.com',
+                            'pluralsight': 'pluralsight.com',
+                            'skillshare': 'skillshare.com',
+                            'lynda': 'lynda.com',
+                            'futurelearn': 'futurelearn.com',
+                            'alison': 'alison.com',
+                            'mit': 'mit.edu',
+                            'harvard': 'harvard.edu',
+                            'stanford': 'stanford.edu',
+                            'cambridge': 'cam.ac.uk',
+                            'oxford': 'ox.ac.uk',
+                            'khan': 'khanacademy.org',
+
+                            // Additional Technology
+                            'apple': 'apple.com',
+                            'microsoft': 'microsoft.com',
+                            'intel': 'intel.com',
+                            'amd': 'amd.com',
+                            'nvidia': 'nvidia.com',
+                            'android': 'android.com',
+                            'ubuntu': 'ubuntu.com',
+                            'redhat': 'redhat.com',
+                            'mongodb': 'mongodb.com',
+                            'mysql': 'mysql.com',
+                            'postgresql': 'postgresql.org',
+                            'redis': 'redis.io',
+                            'elastic': 'elastic.co',
+                            'splunk': 'splunk.com',
+                            'datadog': 'datadoghq.com',
+                            'newrelic': 'newrelic.com',
+                            'sentry': 'sentry.io',
+                            'grafana': 'grafana.com',
+                            'prometheus': 'prometheus.io',
+
+                            // Additional Programming
+                            'npm': 'npmjs.com',
+                            'yarn': 'yarnpkg.com',
+                            'webpack': 'webpack.js.org',
+                            'babel': 'babeljs.io',
+                            'typescript': 'typescriptlang.org',
+                            'python': 'python.org',
+                            'java': 'java.com',
+                            'nodejs': 'nodejs.org',
+                            'react': 'reactjs.org',
+                            'vue': 'vuejs.org',
+                            'angular': 'angular.io',
+                            'svelte': 'svelte.dev',
+                            'jquery': 'jquery.com',
+                            'bootstrap': 'getbootstrap.com',
+                            'tailwind': 'tailwindcss.com',
+                            'sass': 'sass-lang.com',
+                            'less': 'lesscss.org',
+                            'webassembly': 'webassembly.org',
+
+                            // Additional Business & Finance
+                            'bloomberg': 'bloomberg.com',
+                            'marketwatch': 'marketwatch.com',
+                            'investing': 'investing.com',
+                            'yahoo finance': 'finance.yahoo.com',
+                            'google finance': 'google.com/finance',
+                            'moneycontrol': 'moneycontrol.com',
+                            'etmoney': 'etmoney.com',
+                            'zerodha': 'zerodha.com',
+                            'upstox': 'upstox.com',
+                            'angelbroking': 'angelbroking.com',
+                            'icici direct': 'icicidirect.com',
+                            'hdfc securities': 'hdfcsec.com',
+
+                            // Additional Travel
+                            'makemytrip': 'makemytrip.com',
+                            'goibibo': 'goibibo.com',
+                            'booking': 'booking.com',
+                            'agoda': 'agoda.com',
+                            'expedia': 'expedia.com',
+                            'kayak': 'kayak.com',
+                            'skyscanner': 'skyscanner.com',
+                            'tripadvisor': 'tripadvisor.com',
+                            'airbnb': 'airbnb.com',
+                            'trivago': 'trivago.com',
+                            'cleartrip': 'cleartrip.com',
+                            'yatra': 'yatra.com',
+                            'easemytrip': 'easemytrip.com',
+
+                            // Additional Health & Fitness
+                            'webmd': 'webmd.com',
+                            'healthline': 'healthline.com',
+                            'mayoclinic': 'mayoclinic.org',
+                            'who': 'who.int',
+                            'cdc': 'cdc.gov',
+                            'myfitnesspal': 'myfitnesspal.com',
+                            'fitbit': 'fitbit.com',
+                            'strava': 'strava.com',
+                            'runkeeper': 'runkeeper.com',
+                            'headspace': 'headspace.com',
+                            'calm': 'calm.com',
+
+                            // Additional Indian Websites
+                            'irctc': 'irctc.co.in',
+                            'indiaresults': 'indiaresults.com',
+                            'indiapost': 'indiapost.gov.in',
+                            'incometax': 'incometaxindia.gov.in',
+                            'uidai': 'uidai.gov.in',
+                            'digilocker': 'digilocker.gov.in',
+                            'epfo': 'epfindia.gov.in',
+                            'cowin': 'cowin.gov.in',
+                            'aadhaar': 'uidai.gov.in',
+                            'pan': 'incometaxindia.gov.in',
+                            'gst': 'gst.gov.in',
+                            'rti': 'rtionline.gov.in',
+
+                            // Additional Government
+                            'usa': 'usa.gov',
+                            'uk': 'gov.uk',
+                            'canada': 'canada.ca',
+                            'australia': 'australia.gov.au',
+                            'eu': 'europa.eu',
+                            'un': 'un.org',
+                            'who': 'who.int',
+                            'imf': 'imf.org',
+                            'worldbank': 'worldbank.org',
+
+                            // Additional Miscellaneous
+                            'imdb': 'imdb.com',
+                            'rottentomatoes': 'rottentomatoes.com',
+                            'goodreads': 'goodreads.com',
+                            'duolingo': 'duolingo.com',
+                            'memrise': 'memrise.com',
+                            'brainly': 'brainly.com',
+                            'chegg': 'chegg.com',
+                            'coursehero': 'coursehero.com',
+                            'slideshare': 'slideshare.net',
+                            'issuu': 'issuu.com',
+                            'canva': 'canva.com',
+                            'figma': 'figma.com',
+                            'behance': 'behance.net',
+                            'dribbble': 'dribbble.com',
+                            'deviantart': 'deviantart.com',
+                            'flickr': 'flickr.com',
+                            '500px': '500px.com',
+                            'unsplash': 'unsplash.com',
+                            'pexels': 'pexels.com',
+                            'pixabay': 'pixabay.com',
+                            'shutterstock': 'shutterstock.com',
+                            'istock': 'istockphoto.com',
+                            'adobe': 'adobe.com',
+                            'autodesk': 'autodesk.com',
+                            'blender': 'blender.org',
+                            'unity': 'unity.com',
+                            'unreal': 'unrealengine.com',
+                            'sourceforge': 'sourceforge.net',
+                            'archive': 'archive.org',
+                            'wayback': 'web.archive.org',
+                            'speedtest': 'speedtest.net',
+                            'pingdom': 'pingdom.com',
+                            'gtmetrix': 'gtmetrix.com',
+                            'pagespeed': 'developers.google.com/speed/pagespeed/insights',
+                            'webpagetest': 'webpagetest.org',
+                            'sslshopper': 'sslshopper.com',
+                            'ssllabs': 'ssllabs.com',
+                            'virustotal': 'virustotal.com',
+                            'urlscan': 'urlscan.io',
+                            'shodan': 'shodan.io',
+                            'haveibeenpwned': 'haveibeenpwned.com',
+                            'troyhunt': 'troyhunt.com',
+                            'krebs': 'krebsonsecurity.com',
+                            'schneier': 'schneier.com',
+                            'nist': 'nist.gov',
+                            'iso': 'iso.org',
+                            'ietf': 'ietf.org',
+                            'w3c': 'w3.org',
+                            'ietf': 'ietf.org',
+                            'iana': 'iana.org',
+                            'icann': 'icann.org',
+                            'arin': 'arin.net',
+                            'apnic': 'apnic.net',
+                            'ripe': 'ripe.net',
+                            'lacnic': 'lacnic.net',
+                            'afrinic': 'afrinic.net'
+                        };
+                        if (commonSites[cleanWord]) {
+                            console.log("Found common site:", commonSites[cleanWord]);
+                            return { type: 'domain', value: commonSites[cleanWord] };
+                        }
+                    }
+                }
+            }
+
+            // If we have text with spaces, treat it as a search query
+            if (hasSpaces && cleanedText.length > 0) {
+                console.log("Treating as search query:", cleanedText);
+                return { type: 'search', value: cleanedText };
+            }
+
+            console.log("No domain or search query found");
+            return null;
+        }
+
+        // Open website function
+        function openWebsite(domain) {
+            if (!domain) return;
+            
+            const url = domain.startsWith('http') ? domain : `https://${domain}`;
+            resultEl.innerHTML = `🌐 Opening: <strong>${domain}</strong>`;
+            
+            setTimeout(() => {
+                try {
+                    const newWindow = window.open(url, '_blank');
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                        // Popup blocked, redirect current page
+                        window.location.href = url;
+                    }
+                    statusEl.innerHTML = `<span class="success">✅ Success! Opened ${domain}</span>`;
+                    addToRecentDomains(domain);
+                } catch (e) {
+                    statusEl.innerHTML = `<span class="error">❌ Failed to open ${domain}. Please check popup blocker.</span>`;
+                }
+                
+                setTimeout(() => {
+                    statusEl.textContent = "Ready for next command";
+                }, 3000);
+            }, 800);
+        }
+
+        // Perform Google search
+        function performSearch(query) {
+            if (!query) return;
+            
+            // Create a proper Google search URL
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            resultEl.innerHTML = `🔍 Searching: <strong>${query}</strong>`;
+            
+            setTimeout(() => {
+                try {
+                    const newWindow = window.open(searchUrl, '_blank');
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                        // Popup blocked, redirect current page
+                        window.location.href = searchUrl;
+                    }
+                    statusEl.innerHTML = `<span class="success">✅ Searching Google for: ${query}</span>`;
+                } catch (e) {
+                    statusEl.innerHTML = `<span class="error">❌ Failed to search. Please check popup blocker.</span>`;
+                }
+                
+                setTimeout(() => {
+                    statusEl.textContent = "Ready for next command";
+                }, 3000);
+            }, 800);
+        }
+
+        // File operations
+        function showDownloads() {
+            resultEl.innerHTML = `📁 Opening Downloads folder`;
+            statusEl.innerHTML = `<span class="success">✅ Opening Downloads folder</span>`;
+            
+            // In a real application, this would use a file system API
+            // For demo purposes, we'll just show a message
+            setTimeout(() => {
+                alert("In a real application, this would open your Downloads folder");
+            }, 1000);
+        }
+
+        function showDeleteConfirmation(fileName) {
+            pendingAction = { type: 'delete', fileName: fileName };
+            modalMessage.textContent = `Are you sure you want to delete "${fileName}"?`;
+            modal.style.display = 'flex';
+        }
+
+        function deleteFile(fileName) {
+            resultEl.innerHTML = `🗑️ Deleting: <strong>${fileName}</strong>`;
+            statusEl.innerHTML = `<span class="success">✅ File "${fileName}" deleted</span>`;
+            
+            // In a real application, this would use a file system API
+            // For demo purposes, we'll just show a message
+            console.log(`File deletion requested: ${fileName}`);
+            
+            setTimeout(() => {
+                statusEl.textContent = "Ready for next command";
+            }, 3000);
+        }
+
+        function openDashboard() {
+            resultEl.innerHTML = `📊 Opening Dashboard`;
+            statusEl.innerHTML = `<span class="success">✅ Opening Dashboard</span>`;
+            
+            // In a real application, this would navigate to a dashboard
+            // For demo purposes, we'll just show a message
+            setTimeout(() => {
+                alert("In a real application, this would open your system dashboard");
+            }, 1000);
+        }
+
+        // Modal handlers
+        confirmAction.addEventListener('click', function() {
+            if (pendingAction && pendingAction.type === 'delete') {
+                deleteFile(pendingAction.fileName);
+            }
+            modal.style.display = 'none';
+            pendingAction = null;
+        });
+
+        cancelAction.addEventListener('click', function() {
+            modal.style.display = 'none';
+            statusEl.innerHTML = `<span class="error">❌ Action cancelled</span>`;
+            pendingAction = null;
+            
+            setTimeout(() => {
+                statusEl.textContent = "Ready for next command";
+            }, 3000);
+        });
+
+        // Start listening for 5 seconds
+        function startListening() {
+            if (isListening) return;
+
+            isListening = true;
+            micBtn.classList.add('listening');
+            micBtn.innerHTML = `
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" fill="white"/>
+                </svg>
+                Listening...
+            `;
+            
+            // Add timer
+            const timer = document.createElement('div');
+            timer.className = 'timer';
+            timer.id = 'listenTimer';
+            timer.textContent = '5';
+            micBtn.parentElement.appendChild(timer);
+
+            statusEl.textContent = "🎤 Listening for 5 seconds... Speak now!";
+            resultEl.textContent = "Processing your speech...";
+            transcriptEl.textContent = "Listening...";
+
+            let seconds = 5;
+            const timerInterval = setInterval(() => {
+                seconds--;
+                timer.textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                    stopListening();
+                }
+            }, 1000);
+
+            recognition.start();
+        }
+
+        // Stop listening
+        function stopListening() {
+            isListening = false;
+            micBtn.classList.remove('listening');
+            micBtn.innerHTML = `
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" fill="white"/>
+                </svg>
+                Start Listening
+            `;
+            
+            const timer = document.getElementById('listenTimer');
+            if (timer) timer.remove();
+            
+            recognition.stop();
+            statusEl.textContent = "Click microphone to start listening again";
+            transcriptEl.textContent = "Session ended";
+        }
+
+        // Event listeners
+        micBtn.addEventListener('click', function() {
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        });
+
+        // Speech recognition handlers
+        recognition.onresult = function(event) {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                    
+                    // Process final transcript for commands
+                    processCommand(transcript);
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            // Update live transcript
+            transcriptEl.textContent = finalTranscript || interimTranscript || "Listening...";
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            if (event.error === 'not-allowed') {
+                statusEl.innerHTML = `<span class="error">❌ Microphone access denied. Please allow microphone permissions.</span>`;
+            } else {
+                statusEl.innerHTML = `<span class="error">❌ Error: ${event.error}. Please try again.</span>`;
+            }
+            stopListening();
+        };
+
+        recognition.onend = function() {
+            if (isListening) {
+                // If listening ended unexpectedly, try to restart
+                setTimeout(() => {
+                    if (isListening) {
+                        recognition.start();
+                    }
+                }, 100);
+            }
+        };
+
+        // Function to simulate speech for example buttons
+        function speakExample(text) {
+            transcriptEl.textContent = text;
+            processCommand(text);
+        }
+
+        // Initialize recent domains
+        updateRecentDomains();
+
+        console.log("🎯 Advanced Voice Assistant Ready!");
+        console.log("Features:");
+        console.log("- 5-second continuous listening");
+        console.log("- Website opening and searching");
+        console.log("- File system operations");
+        console.log("- Confirmation dialogs for destructive actions");
+        console.log("- Live transcript display");
+        console.log("- Recent domains memory");
+    </script>
+</body>
+</html>
